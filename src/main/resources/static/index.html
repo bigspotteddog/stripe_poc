@@ -2,36 +2,67 @@
 <html lang="en">
   <head>
     <title>Stripe PoC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <script src="https://js.stripe.com/v3/"></script>
   </head>
   <body>
     <form class="example2">
-      <div class="row">
-        <div class="field">
-          <div id="example2-card-number"></div>
-        </div>
-      </div>
-      <div class="row">
-        <div>
-          <div id="example2-card-expiry"></div>
-        </div>
-        <div>
-          <div id="example2-card-cvc"></div>
-        </div>
-      </div>
+      <div id="example2-card-number"></div>
+      <div id="example2-card-expiry"></div>
+      <div id="example2-card-cvc"></div>
       <button type="submit">Submit</button>
-      <div class="error">
-        <span class="message"></span>
-      </div>
     </form>
 
     <div class="success">
       <h3>Token:</h3>
       <div class="token"></div>
-      <div><a class="reset" href="#">Reset</a></div>
     </div>
 
-    <script src="js/index.js" data-rel-js></script>
-    <script src="js/example2.js" data-rel-js></script>
+    <div>
+      <a class="reset" href="#">Reset</a>
+    </div>
+
+    <script>
+      var stripe = Stripe("pk_test_6pRNASCoBOKtIshFeQd4XMUh");
+
+      function registerElements(elements) {
+        var form = document.querySelector("form");
+        var resetButton = document.querySelector("a.reset");
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          stripe.createToken(elements[0]).then(function (result) {
+            if (result.token) {
+              document.querySelector(".token").innerText = result.token.id;
+            }
+          });
+        });
+
+        resetButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          form.reset();
+
+          document.querySelector(".token").innerText = "";
+          elements.forEach(function (element) {
+            element.clear();
+          });
+        });
+      }
+
+      var elements = stripe.elements({});
+
+      var cardNumber = elements.create("cardNumber", {});
+      cardNumber.mount("#example2-card-number");
+
+      var cardExpiry = elements.create("cardExpiry", {});
+      cardExpiry.mount("#example2-card-expiry");
+
+      var cardCvc = elements.create("cardCvc", {});
+      cardCvc.mount("#example2-card-cvc");
+
+      registerElements([cardNumber, cardExpiry, cardCvc]);
+    </script>
   </body>
 </html>
