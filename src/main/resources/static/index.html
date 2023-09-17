@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Stripe PoC</title>
+    <script src="https://js.stripe.com/v3/"></script>
+  </head>
+  <body>
+    <form class="example2">
+      <div class="row">
+        <div class="field">
+          <div id="example2-card-number"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <div id="example2-card-expiry"></div>
+        </div>
+        <div>
+          <div id="example2-card-cvc"></div>
+        </div>
+      </div>
+      <button type="submit">Submit</button>
+      <div class="error">
+        <span class="message"></span>
+      </div>
+    </form>
+
+    <div class="success">
+      <h3>Token:</h3>
+      <div class="token"></div>
+      <div><a class="reset" href="#">Reset</a></div>
+    </div>
+
+    <script src="js/index.js" data-rel-js></script>
+    <script src="js/example2.js" data-rel-js></script>
+  </body>
+</html>
