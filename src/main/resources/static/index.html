@@ -7,10 +7,10 @@
     <script src="https://js.stripe.com/v3/"></script>
   </head>
   <body>
-    <form class="example2">
-      <div id="example2-card-number"></div>
-      <div id="example2-card-expiry"></div>
-      <div id="example2-card-cvc"></div>
+    <form>
+      <div id="card-number"></div>
+      <div id="card-expiry"></div>
+      <div id="card-cvc"></div>
       <button type="submit">Submit</button>
     </form>
 
@@ -27,10 +27,14 @@
         var form = document.querySelector("form");
         var resetButton = document.querySelector("a.reset");
 
+        async function createToken(elements, callback) {
+          const result = await stripe.createToken(elements[0]);
+          callback(result);
+        }
+
         form.addEventListener("submit", function (e) {
           e.preventDefault();
-
-          stripe.createToken(elements[0]).then(function (result) {
+          createToken(elements, function (result) {
             if (result.token) {
               document.querySelector(".result").innerText = result.token.id;
             } else {
@@ -40,27 +44,30 @@
           });
         });
 
-        resetButton.addEventListener("click", function (e) {
-          e.preventDefault();
+        function clearForm() {
           form.reset();
-
           document.querySelector(".result").innerText = "";
           elements.forEach(function (element) {
             element.clear();
           });
+        }
+
+        resetButton.addEventListener("click", function (e) {
+          e.preventDefault();
+          clearForm();
         });
       }
 
       var elements = stripe.elements({});
 
-      var cardNumber = elements.create("cardNumber", {});
-      cardNumber.mount("#example2-card-number");
+      var cardNumber = elements.create("cardNumber");
+      cardNumber.mount("#card-number");
 
-      var cardExpiry = elements.create("cardExpiry", {});
-      cardExpiry.mount("#example2-card-expiry");
+      var cardExpiry = elements.create("cardExpiry");
+      cardExpiry.mount("#card-expiry");
 
-      var cardCvc = elements.create("cardCvc", {});
-      cardCvc.mount("#example2-card-cvc");
+      var cardCvc = elements.create("cardCvc");
+      cardCvc.mount("#card-cvc");
 
       registerElements([cardNumber, cardExpiry, cardCvc]);
     </script>
