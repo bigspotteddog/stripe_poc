@@ -14,10 +14,7 @@
       <button type="submit">Submit</button>
     </form>
 
-    <div class="success">
-      <h3>Token:</h3>
-      <div class="token"></div>
-    </div>
+    <div>Result: <span class="result"></span></div>
 
     <div>
       <a class="reset" href="#">Reset</a>
@@ -35,7 +32,10 @@
 
           stripe.createToken(elements[0]).then(function (result) {
             if (result.token) {
-              document.querySelector(".token").innerText = result.token.id;
+              document.querySelector(".result").innerText = result.token.id;
+            } else {
+              document.querySelector(".result").innerText =
+                result.error.message;
             }
           });
         });
@@ -44,7 +44,7 @@
           e.preventDefault();
           form.reset();
 
-          document.querySelector(".token").innerText = "";
+          document.querySelector(".result").innerText = "";
           elements.forEach(function (element) {
             element.clear();
           });
