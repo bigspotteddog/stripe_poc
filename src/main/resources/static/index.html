@@ -8,6 +8,7 @@
   </head>
   <body>
     <form>
+      <div><input type="text" id="product" value="product_1" /></div>
       <div id="card-number"></div>
       <div id="card-expiry"></div>
       <div id="card-cvc"></div>
@@ -21,22 +22,44 @@
     </div>
 
     <script>
-      var stripe = Stripe("pk_test_6pRNASCoBOKtIshFeQd4XMUh");
+      var stripe = Stripe("pk_test_WSxS2RWAx4H01pumWVwzpybn");
 
       function registerElements(elements) {
         var form = document.querySelector("form");
         var resetButton = document.querySelector("a.reset");
 
-        async function createToken(elements, callback) {
-          const result = await stripe.createToken(elements[0]);
-          callback(result);
+        async function createToken(elements, data, callback) {
+          const result = await stripe.createToken(elements[0], data);
+          callback(result, data);
         }
 
         form.addEventListener("submit", function (e) {
           e.preventDefault();
-          createToken(elements, function (result) {
+          const data = {
+            product: document.getElementById("product").value,
+          };
+          createToken(elements, data, function (result, data) {
+            console.log(result);
             if (result.token) {
               document.querySelector(".result").innerText = result.token.id;
+
+              const body = {
+                token: result.token,
+                data: data,
+              };
+
+              (async () => {
+                const rawResponse = await fetch("/charge", {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(body),
+                });
+                const content = await rawResponse.json();
+                console.log(content);
+              })();
             } else {
               document.querySelector(".result").innerText =
                 result.error.message;
