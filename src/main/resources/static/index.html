@@ -8,7 +8,12 @@
   </head>
   <body>
     <form>
-      <div><input type="text" id="product" value="product_1" /></div>
+      <!-- This is the id of the product being purchased. -->
+      <div><input type="text" id="product" value="product_1" required /></div>
+      <div>
+        <input type="text" id="email" placeholder="your email" required />
+      </div>
+      <!-- This is the credit card information. -->
       <div id="card-number"></div>
       <div id="card-expiry"></div>
       <div id="card-cvc"></div>
@@ -22,12 +27,15 @@
     </div>
 
     <script>
+      // Get the public key from your stripe account.
       var stripe = Stripe("pk_test_WSxS2RWAx4H01pumWVwzpybn");
 
+      // This registers the stripe elements, card, expiration, cvc.
       function registerElements(elements) {
         var form = document.querySelector("form");
         var resetButton = document.querySelector("a.reset");
 
+        // Create a charge token from stripe. We only need to send an element in.
         async function createToken(elements, data, callback) {
           const result = await stripe.createToken(elements[0], data);
           callback(result, data);
@@ -35,9 +43,14 @@
 
         form.addEventListener("submit", function (e) {
           e.preventDefault();
+
+          // Add the product to data.
           const data = {
             product: document.getElementById("product").value,
+            email: document.getElementById("email").value,
           };
+
+          // Call create token with a callback function.
           createToken(elements, data, function (result, data) {
             console.log(result);
             if (result.token) {
@@ -48,6 +61,7 @@
                 data: data,
               };
 
+              // Post the charge to our server with the token and product data.
               (async () => {
                 const rawResponse = await fetch("/charge", {
                   method: "POST",
@@ -67,6 +81,7 @@
           });
         });
 
+        // This resets the form from the reset link.
         function clearForm() {
           form.reset();
           document.querySelector(".result").innerText = "";
@@ -81,6 +96,8 @@
         });
       }
 
+      // Create the credit card elements and bind them to their
+      // container divs.
       var elements = stripe.elements({});
 
       var cardNumber = elements.create("cardNumber");
